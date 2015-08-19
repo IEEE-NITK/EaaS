@@ -30,9 +30,6 @@ class ShiftCipher(Cipher):
         print 'placeholder encryption'
         self.cipherGreeting()
 
-
-
-
 class ClientThread(threading.Thread):
 
     def __init__(self,ip,port):
@@ -41,10 +38,8 @@ class ClientThread(threading.Thread):
         self.port = port
         print "[+] New thread started for "+ip+":"+str(port)
 
-
     def run(self):    
         print "Connection from : "+ip+":"+str(port)
-
         data = "dummydata"
 
         while len(data):
@@ -56,7 +51,7 @@ class ClientThread(threading.Thread):
             clientsock.send(row_format.format("1", "Shift Cipher") + "\n\n")
             clientsock.send("Enter choice: ")
             data = clientsock.recv(2048).strip()
-            print "Client sent : "+data
+            print "Client sent : " + data
             if (data == '1'):
                 ins = ShiftCipher()
                 ins.cipherGreeting()
