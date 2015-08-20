@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import socket, threading
-import string
 
 row_format ="{:>20}" * 2
 
@@ -31,13 +30,7 @@ class ShiftCipher(Cipher):
         self.cipherGreeting()
 
     def encrypt(self):
-        alphabet = 'abcdefghijklmnopqrstuvwxyz'
-        clientsock.send("Enter plaintext: ")
-        ptext = clientsock.recv(2048)
-        clientsock.send("Enter shift: ")
-        shift = int(clientsock.recv(2048))
-        table = string.maketrans(alphabet, alphabet[shift:] + alphabet[:shift])
-        clientsock.send("Ciphertext: " + ptext.translate(table))
+        clientsock.send("Whoops! You're going to have to do this one by hand. :)\n")
         clientsock.recv(2048)
         self.cipherGreeting()
 
