@@ -34,6 +34,26 @@ class ShiftCipher(Cipher):
         clientsock.recv(2048)
         self.cipherGreeting()
 
+class BaconCipher(Cipher):
+
+    def explain(self):
+        # todo
+
+    def encrypt(self):
+        clientsock.send("Whoops! You're going to have to do this one by hand. :)\n")
+        clientsock.recv(2048)
+        self.cipherGreeting()
+
+class XORCipher(Cipher):
+
+    def explain(self):
+        # todo
+
+    def encrypt(self):
+        clientsock.send("Whoops! You're going to have to do this one by hand. :)\n")
+        clientsock.recv(2048)
+        self.cipherGreeting()
+
 class ClientThread(threading.Thread):
 
     def __init__(self,ip,port):
@@ -53,11 +73,19 @@ class ClientThread(threading.Thread):
             clientsock.send(row_format.format("Serial Number", "Encryption Scheme") + "\n")
             clientsock.send(row_format.format("-------------", "-----------------") + "\n")
             clientsock.send(row_format.format("1", "Shift Cipher") + "\n\n")
+            clientsock.send(row_format.format("2", "Bacon's Cipher") + "\n\n")
+            clientsock.send(row_format.format("3", "XOR Cipher") + "\n\n")
             clientsock.send("Enter choice: ")
             data = clientsock.recv(2048).strip()
             print "Client sent : " + data
             if (data == '1'):
                 ins = ShiftCipher()
+                ins.cipherGreeting()
+            elif (data == '2'):
+                ins = BaconCipher()
+                ins.cipherGreeting()
+            elif (data == '3'):
+                ins = XORCipher()
                 ins.cipherGreeting()
 
         print "Client disconnected..."
