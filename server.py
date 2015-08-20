@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import socket, threading
+import string
 
 row_format ="{:>20}" * 2
 
@@ -38,6 +39,7 @@ class BaconCipher(Cipher):
 
     def explain(self):
         # todo
+        pass
 
     def encrypt(self):
         clientsock.send("Whoops! You're going to have to do this one by hand. :)\n")
@@ -48,9 +50,26 @@ class XORCipher(Cipher):
 
     def explain(self):
         # todo
+        pass
 
     def encrypt(self):
         clientsock.send("Whoops! You're going to have to do this one by hand. :)\n")
+        clientsock.recv(2048)
+        self.cipherGreeting()
+
+class DvorakCipher(Cipher):
+
+    def explain(self):
+        # todo
+        pass
+
+    def encrypt(self):
+        qwerty = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        dvorak = "axje.uidchtnmbrl'poygk,qf;AXJE>UIDCHTNMBRL\"POYGK<QF:"
+        table = string.maketrans(qwerty, dvorak)
+        clientsock.send("Enter plaintext: ")
+        ptext = clientsock.recv(2048)
+        clientsock.send("Ciphertext: " + ptext.translate(table))
         clientsock.recv(2048)
         self.cipherGreeting()
 
@@ -75,6 +94,7 @@ class ClientThread(threading.Thread):
             clientsock.send(row_format.format("1", "Shift Cipher") + "\n\n")
             clientsock.send(row_format.format("2", "Bacon's Cipher") + "\n\n")
             clientsock.send(row_format.format("3", "XOR Cipher") + "\n\n")
+            clientsock.send(row_format.format("4", "Dvorak Cipher") + "\n\n")
             clientsock.send("Enter choice: ")
             data = clientsock.recv(2048).strip()
             print "Client sent : " + data
@@ -87,6 +107,9 @@ class ClientThread(threading.Thread):
             elif (data == '3'):
                 ins = XORCipher()
                 ins.cipherGreeting()
+            elif (data == '4'):
+                ins = DvorakCipher()
+                ins.cipherGreeting()
 
         print "Client disconnected..."
 
@@ -98,7 +121,6 @@ tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 tcpsock.bind((host,port))
 threads = []
-
 
 while True:
     tcpsock.listen(4)
