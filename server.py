@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import socket, threading
 import string
+import base64
 
 row_format ="{:>20}" * 2
 
@@ -73,6 +74,31 @@ class DvorakCipher(Cipher):
         clientsock.recv(2048)
         self.cipherGreeting()
 
+# not an encryption scheme; just trollin'
+class Base64(Cipher):
+    
+    def explain(self):
+        clientsock.send("A binary system uses two symbols to encode data.\nA base64 system uses 64 symbols.\n\n")
+        clientsock.send("Moving from left to right in the bit-sequence corresponding to the plaintext, a 24-bit group is formed by joining three 8-bit groups. This is now treated as 4 6-bit groups joined together.\nEach of these groups is translated into a character based on the following table:\n")
+        clientsock.send(row_format.format("Value", "Character" + "\n"))
+        clientsock.send(row_format.format("-----", "---------" + "\n"))
+        clientsock.send(row_format.format("0-25", "A-Z" + "\n"))
+        clientsock.send(row_format.format("26-51", "a-z" + "\n"))
+        clientsock.send(row_format.format("52-61", "0-9" + "\n"))
+        clientsock.send(row_format.format("62", "+" + "\n"))
+        clientsock.send(row_format.format("63", "/" + "\n"))
+        clientsock.send(row_format.format("pad", "=" + "\n\n"))
+        clientsock.send("For example, the text 'IEEE' would become 'SUVFRQo=' on passing through base64.\n")
+        clientsock.recv(2048)
+        self.cipherGreeting()
+
+    def encrypt(self):
+        clientsock.send("Enter plaintext: ")
+        ptext = clientsock.recv(2048)
+        clientsock.send("Ciphertext: " + base64.b64encode(ptext))
+        clientsock.recv(2048)
+        self.cipherGreeting()
+
 class ClientThread(threading.Thread):
 
     def __init__(self,ip,port):
@@ -95,6 +121,7 @@ class ClientThread(threading.Thread):
             clientsock.send(row_format.format("2", "Bacon's Cipher") + "\n\n")
             clientsock.send(row_format.format("3", "XOR Cipher") + "\n\n")
             clientsock.send(row_format.format("4", "Dvorak Cipher") + "\n\n")
+            clientsock.send(row_format.format("5", "Base64 Cipher") + "\n\n") # lol
             clientsock.send("Enter choice: ")
             data = clientsock.recv(2048).strip()
             print "Client sent : " + data
@@ -109,6 +136,9 @@ class ClientThread(threading.Thread):
                 ins.cipherGreeting()
             elif (data == '4'):
                 ins = DvorakCipher()
+                ins.cipherGreeting()
+            elif (data == '5'):
+                ins = Base64()
                 ins.cipherGreeting()
 
         print "Client disconnected..."
