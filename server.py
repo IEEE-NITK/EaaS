@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import socket, threading
+import string
 
 row_format ="{:>20}" * 2
 
@@ -23,11 +24,21 @@ class Cipher():
 class ShiftCipher(Cipher):
 
     def explain(self):
-        print 'placeholder explanation'
+        clientsock.send("The shift cipher is a type of substitution cipher.\n")
+        clientsock.send("Every letter in the plaintext gets replaced by another letter at a fixed distance 'k' from the letter. Here, 'k' is our 'key', and is constant for all letters in the plaintext.\n")
+        clientsock.send("For example, a plaintext of 'ieee' with key 'k' = 3 would be encrypted as 'lhhh'.\n\n")
+        clientsock.recv(2048)
         self.cipherGreeting()
 
     def encrypt(self):
-        print 'placeholder encryption'
+        alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        clientsock.send("Enter plaintext: ")
+        ptext = clientsock.recv(2048)
+        clientsock.send("Enter shift: ")
+        shift = int(clientsock.recv(2048))
+        table = string.maketrans(alphabet, alphabet[shift:] + alphabet[:shift])
+        clientsock.send("Ciphertext: " + ptext.translate(table))
+        clientsock.recv(2048)
         self.cipherGreeting()
 
 class ClientThread(threading.Thread):
