@@ -3,6 +3,8 @@ import socket, threading
 import string
 import base64
 from fractions import gcd
+from itertools import starmap, cycle
+import hashlib
 
 row_format ="{:>20}" * 2
 
@@ -57,6 +59,32 @@ class ShiftCipher(Cipher):
 
     def encrypt(self):
         self.socket.send("Whoops! You're going to have to do this one by hand. :)\n")
+        self.socket.recv(2048)
+        self.cipherGreeting()
+
+class VigenereCipher(Cipher):
+
+    def explain(self):
+        self.socket.send("The Vigenere cipher is a type of polyalphabetic substitution cipher.\n")
+        self.socket.send("Every letter in the plaintext is cyclically shifted to the right by the value of the corresponding key letter.\n")
+        self.socket.send("By value of a letter, we mean A is 0, B is 1, and so on.\n")
+        self.socket.send("The key doesn't have to be as long as the plaintext: just keep repeating it.\n")
+        self.socket.send("For example, if the plaintext is COMPSOC and the key is IEEE, C is shifted to the right I (8) times, giving you K.\n")
+        self.socket.send("C is encrypted with I, O with E, M with E, P with E, and then S with I and so on, giving you the ciphertext KSQTASG.\n")
+        self.socket.recv(2048)
+        self.cipherGreeting()
+
+    def encrypt(self):
+        self.socket.send("Enter plaintext: ")
+        ptext = self.socket.recv(2048)
+        self.socket.send("Enter key: ")
+        key = self.socket.recv(2048)
+        #removing special characters and converting the strings to uppercase:
+        ptext = filter(lambda _: _.isalpha(), ptext.upper())
+        key = filter(lambda _: _.isalpha(), key.upper())
+        #char-by-char encryption:
+        def enc(c,k): return chr(((ord(k) + ord(c)) % 26) + ord('A'))
+        self.socket.send("Ciphertext: " + "".join(starmap(enc, zip(ptext, cycle(key)))).lower())
         self.socket.recv(2048)
         self.cipherGreeting()
 
@@ -120,6 +148,26 @@ class Base64(Cipher):
         self.socket.send("Enter plaintext: ")
         ptext = self.socket.recv(2048)
         self.socket.send("Ciphertext: " + base64.b64encode(ptext))
+        self.socket.recv(2048)
+        self.cipherGreeting()
+
+class MD5(Cipher):
+
+    def explain(self):
+        self.socket.send("MD5 is a hash function that yields a 128-bit hash value, represented as a 32-digit hexadecimal number.\n")
+        self.socket.send("The input message is split into 512-bit blocks after padding accordingly.\n")
+        self.socket.send("The main algorithm works on a 128-bit state, divided into four 32-bit words, each initialized to a certain constant.\n")
+        self.socket.send("Each 512-bit block is then used to modify the state in four rounds of sixteen operations (nonlinear, modular addition and left rotation) each.\n")
+        self.socket.recv(2048)
+        self.cipherGreeting()
+
+    def encrypt(self):
+        self.socket.send("Enter plaintext: ")
+        ptext = self.socket.recv(2048)
+        h = hashlib.md5()
+        h.update(ptext)
+        #Do I print Ciphertext here, or Hash Value? :S
+        self.socket.send("Ciphertext: " + h.hexdigest())
         self.socket.recv(2048)
         self.cipherGreeting()
 
@@ -187,6 +235,8 @@ class ClientThread(threading.Thread):
             self.socket.send(row_format.format("4", "Dvorak Cipher") + "\n\n")
             self.socket.send(row_format.format("5", "Base64 Cipher") + "\n\n") # lol
             self.socket.send(row_format.format("6", "RSA Cryptosystem") + "\n\n")
+            self.socket.send(row_format.format("7", "Vigenere Cipher") + "\n\n")
+            self.socket.send(row_format.format("8", "MD5") + "\n\n")
             self.socket.send("Enter choice: ")
             data = self.socket.recv(2048).strip()
             print "Client sent : " + data
@@ -207,6 +257,12 @@ class ClientThread(threading.Thread):
                 ins.cipherGreeting()
             elif (data == '6'):
                 ins = RSA(self.socket)
+                ins.cipherGreeting()
+            elif (data == '7'):
+                ins = VigenereCipher(self.socket)
+                ins.cipherGreeting()
+            elif (data == '8'):
+                ins = MD5(self.socket)
                 ins.cipherGreeting()
 
         print "Client disconnected..."
