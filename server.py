@@ -2,8 +2,28 @@
 import socket, threading
 import string
 import base64
+from fractions import gcd
 
 row_format ="{:>20}" * 2
+
+class Utilities:
+
+    # Thanks, Wikipedia!
+    def inverse(self, a, n):
+        t = 0
+        r = n
+        newt = 1
+        newr = a
+        while newr != 0:
+            quot = r / newr
+            t, newt = newt, t - quot * newt
+            r, newr = newr, r - quot * newr
+        if (r > 1):
+            return "a not invertible"
+        if (t < 0):
+            t += n
+        return t
+
 
 class Cipher():
 
@@ -108,15 +128,40 @@ class RSA(Cipher):
     def explain(self):
             self.socket.send("The RSA cryptosystem is based on asymmetric key cryptography.\nThis means that the keys used for encryption and decryption are different.\n")
             self.socket.send("We have three main stages:\n(a) Encryption\n(b) Decryption\n(c) Key Generation\n\n")
-            self.socket.send("(a) Encryption\ny = (x ** e) mod n\nHere, x is the binary value of the plaintext, y is the ciphertext.\nThe pair (n, e) is referred to as the public key, and 'e' is the public exponent or encrypting exponent.\n\n")
+            self.socket.send("(a) Encryption\ny = (x ** e) mod n\nHere, x is the binary value of the plaintext, y is the ciphertext. '**' refers to exponentiation.\nThe pair (n, e) is referred to as the public key, and 'e' is the public exponent or encrypting exponent.\n\n")
             self.socket.send("(b) Decryption\nx = (y ** d) mod n\nHere, x, y and n are the same, and d is the private exponent/key or decrypting exponent.\n\n")
             self.socket.send("CONSTRAINTS:\n1. It must be computationally infeasible to obtain the private key from the public key (n, e)\n2. Encryption and decryption should be easy given the parameters. Fast exponentiation is necessary.\n3. We cannot encrypt more than L bits of plaintext, where L is the bit size of n.\n")
             self.socket.send("4. Given n, there should be many possible values for e and d. Otherwise, we can brute force the private key.\n\n")
-            self.socket.send("(c) Key Generation\nThis is how n, e and d are obtained.\n1. Choose two prime numbers, p and q.\n2. n = p * q\n3. Compute a quantity phi (henceforth P) as P = (p - 1) * (q - 1)")
+            self.socket.send("(c) Key Generation\nThis is how n, e and d are obtained.\n1. Choose two prime numbers, p and q.\n2. n = p * q\n3. Compute the Euler totient phi(n) (henceforth P) as P = (p - 1) * (q - 1)\n")
             self.socket.send("4. Choose 'e' such that 0 < e < P and GCD(e, P) is 1.\nMathematically speaking, e and P are relatively prime.\n")
             self.socket.send("5. Compute private key d as (d * e) is congruent to 1 mod P.\nOn rearranging, d = t mod P, where t is the inverse of e.\n")
-            
+            self.socket.recv(2048)
+            self.cipherGreeting()
 
+    def encrypt(self):
+            self.socket.send("Here, we will provide a 'shell' where you can find some of the functions mentioned in the explanation already implemented for you. All you need to do is call them! Of course, you'll have to do some things by hand. You're welcome!\n")
+            self.socket.send("Functions available:\n'mul a b' - multiply two numbers\n'gcd a b' - return gcd of a and b\n'inverse e P' - return 't'; refer to explanation\n'pow a b' - return a raised to b\n'bin s' - returns binary representation of string s\n")
+            self.socket.send("Enter 'q' to go back.\n")
+            while True:
+                    self.socket.send(">")
+                    input = self.socket.recv(2048).strip().split()
+                    if (input[0] == 'q'):
+                        break
+                    elif (input[0] == 'bin'):
+                        self.socket.send("bin(" + input[1].strip() + ") = " + ' '.join(format(ord(x), 'b') for x in input[1].strip()) + "\n")
+                    elif (input[0] == 'pow'):
+                        self.socket.send(str(int(input[1]) ** int(input[2])) + "\n")
+                    elif (input[0] == 'inverse'):
+                        u = Utilities()
+                        self.socket.send(str(u.inverse(int(input[1]), int(input[2]))) + "\n")
+                    elif (input[0] == 'gcd'):
+                        self.socket.send(str(gcd(int(input[1]), int(input[2]))) + "\n")
+                    elif (input[0] == 'mul'):
+                        self.socket.send(str(int(input[1]) * int(input[2])) + "\n") 
+
+            self.socket.recv(2048)
+            self.cipherGreeting()
+            
 class ClientThread(threading.Thread):
 
     def __init__(self,ip,port,socket):
