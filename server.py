@@ -6,7 +6,7 @@ from fractions import gcd
 from itertools import starmap, cycle
 import hashlib
 
-row_format ="{:>20}" * 2
+row_format ="{:>30}" * 2
 
 class Utilities:
 
@@ -33,6 +33,7 @@ class Cipher():
 
     def __init__(self, socket):
         self.socket = socket
+
     def cipherGreeting(self):
         self.socket.send(row_format.format("Explain", "Encrypt!") + "\n")
         self.socket.send(row_format.format("-------", "--------") + "\n")
@@ -47,6 +48,24 @@ class Cipher():
                 self.encrypt()
             elif choice == 'q':
                 return
+
+    def shell(self):
+        while True:
+            self.socket.send(">>")
+            input = self.socket.recv(2048).strip().split()
+            if (input[0] == 'q'):
+                break
+            elif (input[0] == 'bin'):
+                self.socket.send("bin(" + input[1].strip() + ") = " + ' '.join(format(ord(x), 'b') for x in input[1].strip()) + "\n")
+            elif (input[0] == 'pow'):
+                self.socket.send(str(int(input[1]) ** int(input[2])) + "\n")
+            elif (input[0] == 'inverse'):
+                u = Utilities()
+                self.socket.send(str(u.inverse(int(input[1]), int(input[2]))) + "\n")
+            elif (input[0] == 'gcd'):
+                self.socket.send(str(gcd(int(input[1]), int(input[2]))) + "\n")
+            elif (input[0] == 'mul'):
+                self.socket.send(str(int(input[1]) * int(input[2])) + "\n")
 
 class ShiftCipher(Cipher):
 
@@ -190,22 +209,8 @@ class RSA(Cipher):
             self.socket.send("Here, we will provide a 'shell' where you can find some of the functions mentioned in the explanation already implemented for you. All you need to do is call them! Of course, you'll have to do some things by hand. You're welcome!\n")
             self.socket.send("Functions available:\n'mul a b' - multiply two numbers\n'gcd a b' - return gcd of a and b\n'inverse e P' - return 't'; refer to explanation\n'pow a b' - return a raised to b\n'bin s' - returns binary representation of string s\n")
             self.socket.send("Enter 'q' to go back.\n")
-            while True:
-                    self.socket.send(">")
-                    input = self.socket.recv(2048).strip().split()
-                    if (input[0] == 'q'):
-                        break
-                    elif (input[0] == 'bin'):
-                        self.socket.send("bin(" + input[1].strip() + ") = " + ' '.join(format(ord(x), 'b') for x in input[1].strip()) + "\n")
-                    elif (input[0] == 'pow'):
-                        self.socket.send(str(int(input[1]) ** int(input[2])) + "\n")
-                    elif (input[0] == 'inverse'):
-                        u = Utilities()
-                        self.socket.send(str(u.inverse(int(input[1]), int(input[2]))) + "\n")
-                    elif (input[0] == 'gcd'):
-                        self.socket.send(str(gcd(int(input[1]), int(input[2]))) + "\n")
-                    elif (input[0] == 'mul'):
-                        self.socket.send(str(int(input[1]) * int(input[2])) + "\n") 
+
+            self.shell()
 
             self.socket.recv(2048)
             self.cipherGreeting()
@@ -219,6 +224,14 @@ class DiffieHelman(Cipher):
         self.socket.send("Alice computes A = (g ** a) mod p. This is sent to Bob.\nBob computes B = (g ** b) mod p and sends it to Alice.\n")
         self.socket.send("Alice finds (B ** a) mod p, and Bob finds (A ** b) mod p. This value is the same for both!\nWhy? Because ([(g ** a) mod p] ** b) mod p is the same as ([(g ** b) mod p] ** a) mod p.\n")
         self.socket.send("Thus, Alice and Bob now have a shared secret key that no one else knows!\n")
+        self.socket.recv(2048)
+        self.cipherGreeting()
+
+    def encrypt(self):
+        self.socket.send("This is the same 'shell' we saw under RSA, and you can use the same functions as were present there.\nHave fun!\n")
+
+        self.shell()
+
         self.socket.recv(2048)
         self.cipherGreeting()
             
