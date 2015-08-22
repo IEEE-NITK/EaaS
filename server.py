@@ -154,8 +154,13 @@ class XORCipher(Cipher):
 class DvorakCipher(Cipher):
 
     def explain(self):
-        # todo
-        pass
+        self.socket.send("Dvorak encoding is a type of encoding based on the differences of layout of a Qwerty keyboard and a Dvorak keyboard.\n")
+        self.socket.send("It's used to encode plaintext documents in a non-standard way.\n")
+        self.socket.send("Ultimately, you can do one of two things: replace a QWERTY character with it's corresponding Dvorak one (QwDv), or vice-versa (DvQw).\n")
+        self.socket.send("Under DvQw, \"axje.uidchtnmbrl'poygk,qf;\" gets translated to \"abcdefghijklmnopqrstuvwxyz\".\n")
+        self.socket.send("Here, we've implemented only one of the schemes. I wonder which one?\n")
+        self.socket.recv(2048)
+        self.cipherGreeting()
 
     def encrypt(self):
         qwerty = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -199,6 +204,7 @@ class MD5(Cipher):
         self.socket.send("The input message is split into 512-bit blocks after padding accordingly.\n")
         self.socket.send("The main algorithm works on a 128-bit state, divided into four 32-bit words, each initialized to a certain constant.\n")
         self.socket.send("Each 512-bit block is then used to modify the state in four rounds of sixteen operations (nonlinear, modular addition and left rotation) each.\n")
+        self.socket.send("A hash function is a function that maps a data set of variable size to a smaller data set of fixed size.\nIdeally, it is impossible to change a message without changing its hash, and it is impossible to find two messages with the same hash.\n")
         self.socket.recv(2048)
         self.cipherGreeting()
 
