@@ -209,6 +209,18 @@ class RSA(Cipher):
 
             self.socket.recv(2048)
             self.cipherGreeting()
+
+class DiffieHelman(Cipher):
+
+    def explain(self):
+        self.socket.send("You might be wondering how to securely communicate a key to your team. This is where the Diffie Helman Key Exchange comes into play.\n")
+        self.socket.send("The sender and recipient, Alice and Bob, decide on a prime number 'p' and a base number 'g'. It doesn't matter if others see this.\n")
+        self.socket.send("Alice has a secret number 'a', and Bob has a secret number 'b'.\n")
+        self.socket.send("Alice computes A = (g ** a) mod p. This is sent to Bob.\nBob computes B = (g ** b) mod p and sends it to Alice.\n")
+        self.socket.send("Alice finds (B ** a) mod p, and Bob finds (A ** b) mod p. This value is the same for both!\nWhy? Because ([(g ** a) mod p] ** b) mod p is the same as ([(g ** b) mod p] ** a) mod p.\n")
+        self.socket.send("Thus, Alice and Bob now have a shared secret key that no one else knows!\n")
+        self.socket.recv(2048)
+        self.cipherGreeting()
             
 class ClientThread(threading.Thread):
 
@@ -237,6 +249,7 @@ class ClientThread(threading.Thread):
             self.socket.send(row_format.format("6", "RSA Cryptosystem") + "\n\n")
             self.socket.send(row_format.format("7", "Vigenere Cipher") + "\n\n")
             self.socket.send(row_format.format("8", "MD5") + "\n\n")
+            self.socket.send(row_format.format("9", "Diffie Helman Key Exchange") + "\n\n")
             self.socket.send("Enter choice: ")
             data = self.socket.recv(2048).strip()
             print "Client sent : " + data
@@ -264,7 +277,9 @@ class ClientThread(threading.Thread):
             elif (data == '8'):
                 ins = MD5(self.socket)
                 ins.cipherGreeting()
-
+            elif (data == '9'):
+                ins = DiffieHelman(self.socket)
+                ins.cipherGreeting()
         print "Client disconnected..."
 
 host = "0.0.0.0"
