@@ -35,7 +35,7 @@ class Cipher():
             elif (input[0] == 'q'):
                 break
             elif (input[0] == 'bin'):
-                self.socket.send("bin(" + input[1].strip() + ") = " + ' '.join(format(ord(x), 'b') for x in input[1].strip()) + "\n")
+                self.socket.send("bin(\'" + input[1].strip() + "\') = " + str(int(''.join(format(ord(x), 'b') for x in input[1].strip()), 2)) + "\n")
             elif (input[0] == 'pow'):
                 self.socket.send(str(int(input[1]) ** int(input[2])) + "\n")
             elif (input[0] == 'inverse'):
