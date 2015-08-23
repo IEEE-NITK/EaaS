@@ -3,7 +3,7 @@ Encryption as a Service -- Python cryptoservice for the IEEE 2015-2016 First Fes
 
 ## Running
 ### Server:
-* `python server.py`
+* `python src/server.py`
 
 ### Client:
 * Testing: `nc localhost 9999`
