@@ -2,7 +2,7 @@
 import socket, threading
 import string
 import cipher
-import ast
+
 
 # Set the output width for formatted strings
 row_format ="{:>30}" * 2

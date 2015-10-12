@@ -53,6 +53,7 @@ class Cipher():
                 self.socket.send(str(int(input[1]) * int(input[2])) + "\n")
 
 # not an encryption scheme; just trollin'
+# https://en.wikipedia.org/wiki/Base64
 class Base64(Cipher):
     
     def explain(self):
