@@ -10,7 +10,7 @@ Encryption as a Service -- Python cryptoservice for the IEEE 2015-2016 First Fes
 * Final run: `nc <ip> <port>` -- change port in file as well.
 
 ## Contributing
-* Get the code! `git clone https://github.com/kbhat95/EaaS.git`
+* Get the code! `git clone https://github.com/IEEE-NITK/EaaS.git`
 * `cd EaaS`
 * Create a branch named `<yourname>-develop`. Use `git checkout -b <branchname>`.
 * Make changes, stage and commit.
